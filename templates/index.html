@@ -1,5 +1,41 @@
 <html>
-    <h1>
-        Welcome
-    </h1>
+    <body>
+        <form action="/recommendations" method="get">
+            <div>
+                <label for="input">Type a book name:</label>
+                <input type="text" id="input" name="title" list="titles">
+                <datalist id="titles">
+                    {% for title in book_titles %}
+                        <option value="{{ title }}">
+                    {% endfor %}
+                </datalist>
+                <button type="submit">Search</button>
+            </div>
+        </form>
+    </body>
 </html>
+
+<script>
+    // all of this is for not making the autofill too cluttered
+    const inputElement = document.getElementById('input');
+    const datalist = document.getElementById('titles');
+
+    // this line works actually
+    const bookTitles = {{ book_titles|safe }};
+    console.log(bookTitles);
+
+    inputElement.addEventListener('input', function () {
+        const inputValue = inputElement.value.toLowerCase();
+        const suggestions = bookTitles.filter(title => title.toLowerCase().includes(inputValue));
+
+        datalist.innerHTML = ''; // Clear previous suggestions
+
+        if (suggestions.length <= 5) {
+            suggestions.forEach(title => {
+                const option = document.createElement('option');
+                option.value = title;
+                datalist.appendChild(option);
+            });
+        }
+    });
+</script>

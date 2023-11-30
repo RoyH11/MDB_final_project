@@ -1,0 +1,9 @@
+<html>
+    <h1>Recommendations</h1>
+    <ul>
+        {% for recommendation in recommendations %}
+            <li>{{ recommendation }}</li>
+        {% endfor %}
+    </ul>
+    <a href="{{ url_for('index') }}"><button>Home</button></a>
+</html>
