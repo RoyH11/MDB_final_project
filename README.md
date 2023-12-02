@@ -13,24 +13,24 @@ Before you begin, ensure you have the following installed:
 
 1. **Flask:**
    ```bash
-   pip install Flask
+   pip3 install Flask
    ```
 
 2. **MongoDB:**
    ```bash
-   pip install pymongo
+   pip3 install pymongo
    ```
    Install MongoDB Compass [here](https://www.mongodb.com/try/download/compass)
 
 3. **Redis:**
    ```bash
-   pip install redis
+   pip3 install redis
    ```
    Install Redis server [here](https://redis.io/download/)
 
 4. **Neo4j:**
    ```bash
-   pip install neo4j
+   pip3 install neo4j
    ```
    Install Neo4j server [here](https://neo4j.com/download/)
 
