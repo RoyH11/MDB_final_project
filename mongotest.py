@@ -10,20 +10,10 @@ collection = db["books_data"]  # Replace with your actual collection name
 query = {"Title": "Its Only Art If Its Well Hung!"}
 
 # Execute the findOne query
-result = collection.find_one(query)
+result = collection.find_one()
 
-# Print the result on the screen
-if result:
-    print("Book Found:")
-    print("Title:", result["Title"])
-    print("Authors:", result["authors"])
-    print("Image:", result["image"])
-    print("Preview Link:", result["previewLink"])
-    print("Published Date:", result["publishedDate"])
-    print("Info Link:", result["infoLink"])
-    print("Categories:", result["categories"])
-else:
-    print("Book not found.")
+# Print the result
+print(result)
 
 # Close the MongoDB connection
 client.close()

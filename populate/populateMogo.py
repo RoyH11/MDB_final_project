@@ -1,39 +1,40 @@
 from pymongo import MongoClient
-import pandas as pd
+import csv
 
-def import_data(collection_name, my_csv_file_path):
+def import_data(collection_name, csv_file_path):
 
-    # Set up MongoDB connection
-    client = MongoClient("mongodb://localhost:27017")
-    db = client["books"]
-    print(db)
+    # MongoDB connection parameters
+    mongo_uri = "mongodb://localhost:27017"  
+    database_name = "books"  
+
+    # Connect to MongoDB
+    client = MongoClient(mongo_uri)
+    db = client[database_name]
     collection = db[collection_name]
-    print(collection)
 
-    # Specify the CSV file path
-    csv_file_path = my_csv_file_path
+    # Open and read the CSV file
+    with open(csv_file_path, "r", encoding="utf-8") as csvfile:
+        reader = csv.DictReader(csvfile)
 
-    # Set the batch size
-    batch_size = 50
+        total_records = sum(1 for row in reader)  # Get the total number of records
+        csvfile.seek(0)  # Reset the file pointer to the beginning
 
-    # Line count
-    line_count = 0
+        # Iterate over each row in the CSV file
+        for i, row in enumerate(reader, start=1):
+            # Insert the row as a document into the MongoDB collection
+            collection.insert_one(row)
 
-    # Read CSV file in chunks and insert data into MongoDB in batches
-    for chunk in pd.read_csv(csv_file_path, chunksize=batch_size):
-        # Convert the chunk to a list of dictionaries (each row becomes a dictionary)
-        data = chunk.to_dict(orient="records")
+            # Print progress
+            progress_percentage = (i / total_records) * 100
+            print(f"Progress: {i}/{total_records} records processed ({progress_percentage:.2f}%)", end="\r")
 
-        # Increment line count
-        line_count += len(data)
+    # Close the MongoDB connection
+    client.close()
 
-        # Insert data into MongoDB
-        collection.insert_many(data) # potential error
+    print(f"\n{csv_file_path} successfully imported into the '{collection_name}' collection.\n")
 
-        # Print progress
-        print(f"Processed {line_count} lines.")
-        
-    print(f"{csv_file_path} imported successfully.")
+
+    
 
 
 
