@@ -4,7 +4,7 @@ We are using this following dataset.
 
 [Data Download](https://www.kaggle.com/datasets/mohamedbakhet/amazon-books-reviews?select=books_data.csv)
 
-Create a folder named `data` and put `books_data.csv` and `Books_rating.csv` inside this folder.
+Create a folder named `data` in the root directory and put `books_data.csv` and `Books_rating.csv` inside this folder.
 
 ## Prerequisites
 
