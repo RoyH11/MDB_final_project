@@ -28,7 +28,7 @@ def import_data(collection_name, my_csv_file_path):
         line_count += len(data)
 
         # Insert data into MongoDB
-        collection.insert_many(data)
+        collection.insert_many(data) # potential error
 
         # Print progress
         print(f"Processed {line_count} lines.")
