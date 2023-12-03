@@ -1,10 +1,6 @@
 # MDB_final_project
 
-We are using this following dataset. 
-
-[Data Download](https://www.kaggle.com/datasets/mohamedbakhet/amazon-books-reviews?select=books_data.csv)
-
-Create a folder named `data` in the root directory and put `books_data.csv` and `Books_rating.csv` inside this folder.
+[Link]()
 
 ## Prerequisites
 
@@ -41,6 +37,8 @@ Before you begin, ensure you have the following installed:
 5. **Book Review Data:**
    
    The dataset being used is [here](https://www.kaggle.com/datasets/mohamedbakhet/amazon-books-reviews?select=books_data.csv)
+
+   Create a folder named `data` in the root directory and put `books_data.csv` and `Books_rating.csv` inside this folder.
 
    **License:**
    The book review dataset is provided under the [CC0 1.0 Universal (CC0 1.0) Public Domain Dedication](https://creativecommons.org/publicdomain/zero/1.0/). This means the dataset is released into the public domain, and you are free to use, modify, distribute, and perform the work, even for commercial purposes, without asking permission.
