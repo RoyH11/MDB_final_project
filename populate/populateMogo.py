@@ -4,7 +4,7 @@ import pandas as pd
 def import_data(collection_name, my_csv_file_path):
 
     # Set up MongoDB connection
-    client = MongoClient("mongodb://192.168.240.1:27017")
+    client = MongoClient("mongodb://localhost:27017")
     db = client["books"]
     print(db)
     collection = db[collection_name]
