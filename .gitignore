@@ -2,3 +2,4 @@ __pycache__/*
 data/*
 idea/*
 HelloWorld.py
+models/__pycache__/*
