@@ -1,28 +1,28 @@
 import pymongo
-from neo4j import GraphDatabase
-from redis import Redis
+import neo4j
+import redis
 
-class MongoClient:
+class MongoModel:
     def __init__(self, url="mongodb://localhost:27017"):
         self.mongoUrl = url
-        self.mongoClient = pymongo.MongoClient(url)
+        self.client = pymongo.MongoClient(url)
 
     def close(self):
-        self.mongoClient.close()
+        self.client.close()
 
 
-class Neo4jClient:
+class Neo4jModel:
     def __init__(self, url="bolt://localhost:7687", user="[placeholder]", password="[placeholder]"):
         self.neo4jUrl = url
-        self.neo4jDriver = GraphDatabase.driver(url, auth=(user, password))
+        self.driver = neo4j.GraphDatabase.driver(url, auth=(user, password))
 
     def close(self):
-        self.neo4jDriver.close()
+        self.driver.close()
 
 
-class RedisClient:
+class RedisModel:
     def __init__(self, port=6379):
-        self.redisClient = Redis(port=port)
+        self.client = redis.Redis(port=port)
 
     def close(self):
-        self.redisClient.close()
+        self.client.close()

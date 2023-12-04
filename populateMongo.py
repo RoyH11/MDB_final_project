@@ -1,4 +1,4 @@
-from models import MongoClient
+from models import MongoModel
 import csv
 
 def import_data(collection_name, path):
@@ -8,10 +8,17 @@ def import_data(collection_name, path):
     database_name = "books"  
 
     # Connect to MongoDB
-    client = MongoClient(mongo_uri).mongoClient
+    model = MongoModel(mongo_uri)
+
+    client = model.client
 
     db = client[database_name]
     collection = db[collection_name]
+
+    rows_to_insert = []
+
+
+    # TODO batch size dont do all at once
 
     # Open and read the CSV file
     with open(path, "r", encoding="utf-8") as csvfile:
@@ -22,19 +29,19 @@ def import_data(collection_name, path):
 
         # Iterate over each row in the CSV file
         for i, row in enumerate(reader, start=1):
-            # skip headers
+
             if i == 1:
                 continue
 
-            # Insert the row as a document into the MongoDB collection
-            collection.insert_one(row)
-
+            rows_to_insert.append(row)
             # Print progress
             progress_percentage = (i / total_records) * 100
-            print(f"Progress: {i}/{total_records} records processed ({progress_percentage:.2f}%)", end="\r")
+            print(f"Progress: {i-1}/{total_records} records processed ({progress_percentage:.2f}%)", end="\r")
 
+
+    collection.insert_many(rows_to_insert)
     # Close the MongoDB connection
-    client.close()
+    model.close()
 
     print(f"\n{collection_name} successfully imported.\n")
 
