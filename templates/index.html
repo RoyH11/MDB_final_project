@@ -3,13 +3,14 @@
         <form action="/recommendations" method="get">
             <div>
                 <label for="input">Type a book name:</label>
-                <input type="text" id="input" name="title" list="titles">
+                <input type="text" id="input" name="title" list="titles" style="width: 300px;">
                 <datalist id="titles">
                     {% for title in book_titles %}
                         <option value="{{ title }}">
                     {% endfor %}
                 </datalist>
                 <button type="submit">Search</button>
+                <button type="button" id="randomButton">Random</button>
             </div>
         </form>
     </body>
@@ -19,6 +20,7 @@
     // all of this is for not making the autofill too cluttered
     const inputElement = document.getElementById('input');
     const datalist = document.getElementById('titles');
+    const randomButton = document.getElementById('randomButton');
 
     // this line works actually
     const bookTitles = {{ book_titles|safe }};
@@ -26,11 +28,11 @@
 
     inputElement.addEventListener('input', function () {
         const inputValue = inputElement.value.toLowerCase();
-        const suggestions = bookTitles.filter(title => title.toLowerCase().includes(inputValue));
+        const suggestions = bookTitles.filter(title => title.toLowerCase().startsWith(inputValue));
 
         datalist.innerHTML = ''; // Clear previous suggestions
 
-        if (suggestions.length <= 5) {
+        if (suggestions.length <= 10) {
             suggestions.forEach(title => {
                 const option = document.createElement('option');
                 option.value = title;
@@ -38,4 +40,10 @@
             });
         }
     });
+
+    randomButton.addEventListener('click', function () {
+                const randomIndex = Math.floor(Math.random() * bookTitles.length);
+                const randomTitle = bookTitles[randomIndex];
+                inputElement.value = randomTitle;
+            });
 </script>
