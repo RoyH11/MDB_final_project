@@ -1,4 +1,4 @@
-models/__pycache__/*
+__pycache__/*
 data/*
 idea/*
 HelloWorld.py
