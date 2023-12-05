@@ -3,11 +3,8 @@
         <form id="bookForm" action="/recommendations" method="get">
             <div>
                 <label for="input">Type a book name:</label>
-                <input type="text" id="input" name="title" list="titles" style="width: 300px;">
+                <input type="text" id="input" name="title" list="titlesList" style="width: 300px;">
                 <datalist id="titlesList">
-                    {% for title in book_titles %}
-                        <option value="{{ title }}">
-                    {% endfor %}
                 </datalist>
                 <button type="button" id="searchButton">Search</button>
                 <button type="button" id="randomButton">Random</button>
@@ -25,7 +22,6 @@
 
     // this line works actually
     const bookTitles = {{ book_titles|safe }};
-    console.log(bookTitles)
 
     inputElement.addEventListener('input', function () {
         const inputValue = inputElement.value.toLowerCase();
@@ -33,13 +29,17 @@
 
         datalist.innerHTML = ''; // Clear previous suggestions
 
-        if (suggestions.length <= 10) {
-            suggestions.forEach(title => {
+
+        suggestions.forEach(title => {
                 const option = document.createElement('option');
                 option.value = title;
-                datalist.appendChild(option);
+                const numOptions = datalist.options.length
+
+                if(numOptions < 5)
+                    datalist.appendChild(option);
+                else
+                    return;
             });
-        }
     });
 
     randomButton.addEventListener('click', function () {

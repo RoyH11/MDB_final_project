@@ -45,7 +45,6 @@ def import_data(collection_name, path):
 
 
     collection.insert_many(rows_to_insert)
-    model.create_text_index()
 
     # Close the MongoDB connection
     model.close()
@@ -55,7 +54,3 @@ def import_data(collection_name, path):
 
 if __name__ == "__main__":
     import_data("books", "data/books_data.csv")
-
-    # this doesnt work
-    #import_data("ratings", "data/Books_rating.csv")
-

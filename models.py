@@ -24,48 +24,78 @@ class MongoModel:
 
         return titles
     
-    def get_book(self, title):
+    def create_index(self):
         database = self.client["books"]
         collection = database["books"]
 
-        book_document = collection.find_one({"Title": title})
-        
-        book_dict = {
-                key: value for key, value in book_document.items() if key != "_id"
-            }
-        return book_dict
-    
-    def create_text_index(self):
-        database = self.client["books"]
-        collection = database["books"]
-
-        # Create a text index on the "description" field if it doesn't exist
+        # Create a text index on the "description, Title, and categories" fields if it doesn't exist
         index_info = collection.index_information()
-        if "description_text" not in index_info:
-            collection.create_index([("description", "text")], name="description_text")
-            print("Created text index on description")
+        if "description_title_categories_text" not in index_info:
+            collection.create_index([("description", "text"), ("Title", "text")], 
+                                    name="description_Title_categories_text", 
+                                    weights={"description": 1, "Title": 2, "categories": 2})
+            
+            print("Created text index on description, Title, and categories")
+
+    def get_book_by_title(self, title):
+        database = self.client["books"]
+        collection = database["books"]
+
+        target_book = collection.find_one({"Title": title})
+        return {
+            "Title": target_book["Title"],
+            "description": target_book["description"],
+            "categories": target_book["categories"]
+        }
 
     def get_recommendations(self, title):
         database = self.client["books"]
         collection = database["books"]
 
         target_book = collection.find_one({"Title": title})
+        if not target_book:
+            return []
+        
+        self.create_index()
 
         search_result = collection.find(
-                {"$text": {"$search": target_book['description']}},
-                {"score": {"$meta": "textScore"}}
-            ).sort([("score", {"$meta": "textScore"})]).limit(6)
+        {
+            "$text": {"$search": f'{title} {target_book["description"]} {target_book["categories"]}'},
+        },
+        {"Title": 1, "description": 1, "categories": 1, "score": {"$meta": "textScore"}}).sort([("score", {"$meta": "textScore"})]).limit(6)
+
+        max_similarity = search_result[0]["score"]
 
         # Extract recommended books as dictionaries
         recommended_books = [
             {
-                "title": book["Title"],
+                "Title": book["Title"],
                 "description": book["description"],
-                "similarity": book["score"],
+                "similarity": f"{book['score']/max_similarity*100:.2f}%",
                 "categories": book["categories"]
             }
             for book in search_result if book["_id"] != target_book["_id"]
         ]
+
+        # for if description fails
+        if len(recommended_books) == 0:
+            search_result = collection.find(
+            {
+                "$text": {"$search": f'{title} {target_book["categories"]}'},
+            },
+            {"Title": 1, "description": 1, "categories": 1, "score": {"$meta": "textScore"}}).sort([("score", {"$meta": "textScore"})]).limit(6)
+
+            max_similarity = search_result[0]["score"]
+
+            recommended_books = [
+                {
+                    "title": book["Title"],
+                    "description": book["description"],
+                    "similarity": f"{book['score']/max_similarity*100:.2f}%",
+                    "categories": book["categories"]
+                }
+                for book in search_result if book["_id"] != target_book["_id"]
+            ]
 
         return recommended_books
 
