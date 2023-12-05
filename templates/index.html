@@ -3,7 +3,7 @@
         <form id="bookForm" action="/recommendations" method="get">
             <div>
                 <label for="input">Type a book name:</label>
-                <input type="text" id="input" name="title" list="titles" style="width: 300px;">
+                <input type="text" id="input" name="title" list="titlesList" style="width: 300px;">
                 <datalist id="titlesList">
                     {% for title in book_titles %}
                         <option value="{{ title }}">
@@ -33,11 +33,22 @@
 
         datalist.innerHTML = ''; // Clear previous suggestions
 
-        if (suggestions.length <= 10) {
+        // Counter to track the number of elements added
+        let counter = 0;
+
+        if (suggestions.length) {
             suggestions.forEach(title => {
-                const option = document.createElement('option');
-                option.value = title;
-                datalist.appendChild(option);
+                if (counter < 5) {
+                    const option = document.createElement('option');
+                    option.value = title;
+                    datalist.appendChild(option);
+
+                    // Increment the counter
+                    counter++;
+                } else {
+                    // Break out of the loop if 5 elements are already added
+                    return;
+                }
             });
         }
     });

@@ -24,14 +24,15 @@ def import_data(collection_name, path):
         total_records = sum(1 for _ in reader)  # Get the total number of records
         csvfile.seek(0)  # Reset the file pointer to the beginning
 
+        # Columns to exclude
+        exclude_columns = ["infoLink", "authors", "image", "previewLink", "publisher", "publishedDate", "ratingsCount"]
+
         # Iterate over each row in the CSV file
         for i, row in enumerate(reader, start=1):
 
             if i == 1:
-                continue
-
-            # Columns to exclude
-            exclude_columns = ["infoLink", "authors", "image", "previewLink", "publisher", "publishedDate", "ratingsCount"]
+                continue  # Skip the header row
+            
 
             # Check if the row has a non-empty "description" and "categories"
             if row.get("description") and row.get("categories"):
@@ -40,9 +41,10 @@ def import_data(collection_name, path):
                 rows_to_insert.append(filtered_row)
 
             # Print progress
-            progress_percentage = (i / total_records) * 100
+            progress_percentage = ((i-1) / total_records) * 100
             print(f"Progress: {i-1}/{total_records} records processed ({progress_percentage:.2f}%)", end="\r")
 
+    print(f"\nImporting {collection_name}...")
 
     collection.insert_many(rows_to_insert)
     model.create_text_index()
@@ -50,7 +52,10 @@ def import_data(collection_name, path):
     # Close the MongoDB connection
     model.close()
 
-    print(f"\n{collection_name} successfully imported.\n")
+    print(f"{collection_name} successfully imported.\n")
+
+
+
 
 
 if __name__ == "__main__":
