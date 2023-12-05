@@ -13,18 +13,29 @@ def index():
     titles = mongoModel.get_all_titles()
     mongoModel.close()
 
-    return render_template("index.html", book_titles=jsonify(titles).json)
+    return render_template("index.html", book_titles=titles)
 
-@app.route("/recommendations", methods=["GET"])
-def recommendations():
+@app.route("/book", methods=["GET"])
+def get_book():
     mongoModel = MongoModel()
-    title = request.args.get("title")
-    recommendations = mongoModel.get_recommendations(title)
+
+    title = request.args.get('title')
+
+    selected_book = mongoModel.get_book(title)
     mongoModel.close()
 
-    return render_template("recommendations.html", recommendations=jsonify(recommendations).json)
+    return selected_book
+
+# doesnt work at the moment
+
+# @app.route("/recommendations")
+# def recommendations():
+#     mongoModel = MongoModel()
+#     title = request.args.get("title")
+#     recommendations = mongoModel.get_recommendations(title)
+#     mongoModel.close()
+
+#     return render_template("recommendations.html", recommendations=jsonify(recommendations).json, title=title)
 
 if __name__ == "__main__":
-    #mongoModel = MongoModel()
-    #mongoModel.create_text_index()
     app.run(host='127.0.0.1', port=8888, debug=True)

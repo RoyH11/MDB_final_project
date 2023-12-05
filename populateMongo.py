@@ -17,9 +17,6 @@ def import_data(collection_name, path):
 
     rows_to_insert = []
 
-
-    # TODO batch size dont do all at once
-
     # Open and read the CSV file
     with open(path, "r", encoding="utf-8") as csvfile:
         reader = csv.DictReader(csvfile)
@@ -33,13 +30,23 @@ def import_data(collection_name, path):
             if i == 1:
                 continue
 
-            rows_to_insert.append(row)
+            # Columns to exclude
+            exclude_columns = ["infoLink", "authors", "image", "previewLink", "publisher", "publishedDate", "ratingsCount"]
+
+            # Check if the row has a non-empty "description" and "categories"
+            if row.get("description") and row.get("categories"):
+                # exclude certain columns
+                filtered_row = {key: value for key, value in row.items() if key not in exclude_columns}
+                rows_to_insert.append(filtered_row)
+
             # Print progress
             progress_percentage = (i / total_records) * 100
             print(f"Progress: {i-1}/{total_records} records processed ({progress_percentage:.2f}%)", end="\r")
 
 
     collection.insert_many(rows_to_insert)
+    model.create_text_index()
+
     # Close the MongoDB connection
     model.close()
 
@@ -48,5 +55,5 @@ def import_data(collection_name, path):
 
 if __name__ == "__main__":
     import_data("books", "data/books_data.csv")
-    import_data("ratings", "data/Books_rating.csv")
+    #import_data("ratings", "data/Books_rating.csv")
 

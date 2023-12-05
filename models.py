@@ -25,6 +25,17 @@ class MongoModel:
 
         return titles
     
+    def get_book(self, title):
+        database = self.client["books"]
+        collection = database["books"]
+
+        book_document = collection.find_one({"Title": title})
+        
+        book_dict = {
+                key: value for key, value in book_document.items() if key != "_id"
+            }
+        return book_dict
+    
     def create_text_index(self):
         database = self.client["books"]
         collection = database["books"]
@@ -32,29 +43,33 @@ class MongoModel:
         index_info = collection.index_information()
         if "description_text" not in index_info:
             collection.create_index([("description", "text")], name="description_text")
+            print("Created text index on description")
     
-    def get_recommendations(self, title):
-        # Find the document for the provided title
-        query = {"Title": title}
-        database = self.client["books"]
-        collection = database["books"]
+    # not working right now
 
-        target_book = collection.find_one(query)
+    # def get_recommendations(self, title):
+    #     database = self.client["books"]
+    #     collection = database["books"]
 
-        if target_book:
-            # Use full-text search to find similar books based on the description
-            search_result = collection.find(
-                {"$text": {"$search": target_book['description']}},
-                {"score": {"$meta": "textScore"}}
-            ).sort([("score", {"$meta": "textScore"})]).limit(6)
+    #     target_book = collection.find_one({"Title": title})
 
-            # Extract recommended titles
-            recommended_titles = [book["Title"] for book in search_result if book["_id"] != target_book["_id"]]
+    #     search_result = collection.find(
+    #             {"$text": {"$search": target_book['description']}},
+    #             {"score": {"$meta": "textScore"}}
+    #         ).sort([("score", {"$meta": "textScore"})]).limit(6)
 
-            return recommended_titles
-        else:
-            print("damn")
-            return []
+    #     # Extract recommended books as dictionaries
+    #     recommended_books = [
+    #         {
+    #             "title": book["Title"],
+    #             "description": book["description"],
+    #             "similarity": book["score"],
+    #             "categories": book["categories"]
+    #         }
+    #         for book in search_result if book["_id"] != target_book["_id"]
+    #     ]
+
+    #     return recommended_books
 
 
 class Neo4jModel:

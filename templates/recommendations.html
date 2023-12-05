@@ -1,8 +1,13 @@
 <html>
-    <h1>Recommendations</h1>
+    <h1>Recommendations for: {{ title }}</h1>
     <ul>
         {% for recommendation in recommendations %}
-            <li>{{ recommendation }}</li>
+            <li>
+                <strong>Title:</strong> {{ recommendation['title'] }}<br>
+                <strong>Similarity:</strong> {{ recommendation['similarity'] }}<br>
+                <strong>Categories: </strong> {{ recommendation['categories'] }}<br>
+                <details><summary><strong>Description:</strong></summary> {{ recommendation['description'] }}</details><br> 
+            </li>
         {% endfor %}
     </ul>
     <a href="{{ url_for('index') }}"><button>Home</button></a>
