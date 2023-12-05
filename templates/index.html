@@ -1,6 +1,6 @@
 <html>
     <body>
-        <form id="bookForm" action="/book" method="get">
+        <form id="bookForm" action="/recommendations" method="get">
             <div>
                 <label for="input">Type a book name:</label>
                 <input type="text" id="input" name="title" list="titles" style="width: 300px;">
@@ -9,15 +9,11 @@
                         <option value="{{ title }}">
                     {% endfor %}
                 </datalist>
-                <button type="button" id="addButton">Add</button>
+                <button type="button" id="searchButton">Search</button>
                 <button type="button" id="randomButton">Random</button>
             </div>
         </form>
     </body>
-    <div id="selectedBooks">
-        <h2>Your Selected Books:</h2>
-        <ul id="selectedBooksList"></ul>
-    </div>
 </html>
 
 <script>
@@ -25,9 +21,11 @@
     const inputElement = document.getElementById('input');
     const datalist = document.getElementById('titlesList');
     const randomButton = document.getElementById('randomButton');
+    const searchButton = document.getElementById('searchButton');
 
     // this line works actually
     const bookTitles = {{ book_titles|safe }};
+    console.log(bookTitles)
 
     inputElement.addEventListener('input', function () {
         const inputValue = inputElement.value.toLowerCase();
@@ -50,57 +48,8 @@
                 inputElement.value = randomTitle;
             });
 
-    document.getElementById('addButton').addEventListener('click', function () {
-                // Get the book title from the input
-                var title = document.getElementById('input').value;
-
-                // Make an AJAX request to the server to get book information
-                var xhr = new XMLHttpRequest();
-                xhr.open('GET', '/book?title=' + title, true);
-                xhr.onreadystatechange = function () {
-                    if (xhr.readyState == 4 && xhr.status == 200) {
-                        var bookInfo = JSON.parse(xhr.responseText);
-                        // Append the book to the list
-                        var selectedBooksList = document.getElementById('selectedBooksList');
-                        var listItem = document.createElement('li');
-                        
-                        var titleDiv = document.createElement('div');
-                        titleDiv.textContent = 'Title: ';
-
-                        // Create a span for the title without bold styling
-                        var titleSpan = document.createElement('span');
-                        titleSpan.textContent = bookInfo["Title"];
-
-                        // Create a div for the "Categories:" label with bold styling
-                        var categoriesDiv = document.createElement('div');
-                        categoriesDiv.textContent = 'Categories: ';
-
-                        // Create a span for the categories without bold styling
-                        var categoriesSpan = document.createElement('span');
-                        categoriesSpan.textContent = bookInfo["categories"];
-
-                        var descriptionDetails = document.createElement('details');
-                        var summary = document.createElement('summary');
-                        summary.textContent = 'Description';
-                        var descriptionParagraph = document.createElement('p');
-                        descriptionParagraph.textContent = bookInfo["description"];
-
-                        // Append nested elements
-                        descriptionDetails.appendChild(summary);
-                        descriptionDetails.appendChild(descriptionParagraph);
-
-        
-                        titleDiv.appendChild(titleSpan);
-                        categoriesDiv.appendChild(categoriesSpan);
-
-                        listItem.appendChild(titleDiv);
-                        listItem.appendChild(categoriesDiv);
-                        listItem.appendChild(descriptionDetails);
-
-                        // Finally, append the list item to the selectedBooksList
-                        selectedBooksList.appendChild(listItem);
-                    }
-                };
-                xhr.send();
+    searchButton.addEventListener('click', function () {
+                const title = inputElement.value;
+                window.location.href = `/recommendations?title=${encodeURIComponent(title)}`;
             });
 </script>

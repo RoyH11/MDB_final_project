@@ -1,7 +1,6 @@
 import pymongo
 import neo4j
-import redis
-from bson.son import SON
+import json
 
 class MongoModel:
     def __init__(self, url="mongodb://localhost:27017"):
@@ -39,37 +38,36 @@ class MongoModel:
     def create_text_index(self):
         database = self.client["books"]
         collection = database["books"]
+
         # Create a text index on the "description" field if it doesn't exist
         index_info = collection.index_information()
         if "description_text" not in index_info:
             collection.create_index([("description", "text")], name="description_text")
             print("Created text index on description")
-    
-    # not working right now
 
-    # def get_recommendations(self, title):
-    #     database = self.client["books"]
-    #     collection = database["books"]
+    def get_recommendations(self, title):
+        database = self.client["books"]
+        collection = database["books"]
 
-    #     target_book = collection.find_one({"Title": title})
+        target_book = collection.find_one({"Title": title})
 
-    #     search_result = collection.find(
-    #             {"$text": {"$search": target_book['description']}},
-    #             {"score": {"$meta": "textScore"}}
-    #         ).sort([("score", {"$meta": "textScore"})]).limit(6)
+        search_result = collection.find(
+                {"$text": {"$search": target_book['description']}},
+                {"score": {"$meta": "textScore"}}
+            ).sort([("score", {"$meta": "textScore"})]).limit(6)
 
-    #     # Extract recommended books as dictionaries
-    #     recommended_books = [
-    #         {
-    #             "title": book["Title"],
-    #             "description": book["description"],
-    #             "similarity": book["score"],
-    #             "categories": book["categories"]
-    #         }
-    #         for book in search_result if book["_id"] != target_book["_id"]
-    #     ]
+        # Extract recommended books as dictionaries
+        recommended_books = [
+            {
+                "title": book["Title"],
+                "description": book["description"],
+                "similarity": book["score"],
+                "categories": book["categories"]
+            }
+            for book in search_result if book["_id"] != target_book["_id"]
+        ]
 
-    #     return recommended_books
+        return recommended_books
 
 
 class Neo4jModel:
@@ -79,11 +77,3 @@ class Neo4jModel:
 
     def close(self):
         self.driver.close()
-
-
-class RedisModel:
-    def __init__(self, port=6379):
-        self.client = redis.Redis(port=port)
-
-    def close(self):
-        self.client.close()
