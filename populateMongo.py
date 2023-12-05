@@ -24,14 +24,13 @@ def import_data(collection_name, path):
         total_records = sum(1 for _ in reader)  # Get the total number of records
         csvfile.seek(0)  # Reset the file pointer to the beginning
 
+        # Columns to exclude
+        exclude_columns = ["infoLink", "authors", "image", "previewLink", "publisher", "publishedDate", "ratingsCount"]
+
         # Iterate over each row in the CSV file
         for i, row in enumerate(reader, start=1):
-
             if i == 1:
                 continue
-
-            # Columns to exclude
-            exclude_columns = ["infoLink", "authors", "image", "previewLink", "publisher", "publishedDate", "ratingsCount"]
 
             # Check if the row has a non-empty "description" and "categories"
             if row.get("description") and row.get("categories"):
