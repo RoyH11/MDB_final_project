@@ -6,9 +6,18 @@
                 <input type="text" id="input" name="title" list="titlesList" style="width: 300px;">
                 <datalist id="titlesList">
                 </datalist>
-                <button type="button" id="searchButton">Search</button>
+                <button type="submit" id="searchButton">Search</button>
                 <button type="button" id="randomButton">Random</button>
             </div>
+        </form>
+        <br>
+        <br>
+        <br>
+        <br>
+        <form action="/login" method="get">
+            <label for="login">Enter username:</label>
+            <input type="text" id="login" name="username" style="width: 300px;">
+            <button type="submit">Sign In</button>
         </form>
     </body>
 </html>
@@ -48,8 +57,16 @@
                 inputElement.value = randomTitle;
             });
 
-    searchButton.addEventListener('click', function () {
-                const title = inputElement.value;
-                window.location.href = `/recommendations?title=${encodeURIComponent(title)}`;
+    document.getElementById('bookForm').addEventListener('submit', function (event) {
+                const enteredTitle = inputElement.value;
+
+                // Check if the entered title is in the bookTitles array
+                if (!bookTitles.includes(enteredTitle)) {
+                    // Prevent the default form submission behavior
+                    event.preventDefault();
+
+                    // Display an error message (you can customize this part)
+                    alert('Invalid title. Please enter a valid book title.');
+                }
             });
 </script>

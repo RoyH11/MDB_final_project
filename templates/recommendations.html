@@ -1,17 +1,17 @@
 <html>
     <div>
-        <div><strong>Recommendations for:</strong>{{ book['Title'] }}</div>
-        <div><strong>Categories:</strong>{{ book['categories'] }}</div>
-        <div><details><summary><strong>Description:</strong></summary>{{ book['description'] }}</details></div>
+        <div><strong>Recommendations for: </strong>{{ book['Title'] }}</div>
+        <div><strong>Categories: </strong>{{ book['categories'] }}</div>
+        <div><details><summary><strong>Description: </strong></summary>{{ book['description'] }}</details></div>
     </div>
     <hr>
     <ul>
         {% for recommendation in recommendations %}
             <li>
-                <strong>Title:</strong>{{ recommendation['Title'] }}<br>
-                <strong>Similarity:</strong>{{ recommendation['similarity'] }}<br>
+                <strong>Title: </strong>{{ recommendation['Title'] }}<br>
+                <strong>Similarity: </strong>{{ recommendation['similarity'] }}<br>
                 <strong>Categories: </strong>{{ recommendation['categories'] }}<br>
-                <details><summary><strong>Description:</strong></summary>{{ recommendation['description'] }}</details><br> 
+                <details><summary><strong>Description: </strong></summary>{{ recommendation['description'] }}</details><br> 
             </li>
         {% endfor %}
     </ul>

@@ -4,16 +4,10 @@ import csv
 def import_data(collection_name, path):
 
     # MongoDB connection parameters
-    mongo_uri = "mongodb://localhost:27017"  
-    database_name = "books"  
+    mongo_uri = "mongodb://localhost:27017"
 
     # Connect to MongoDB
     model = MongoModel(mongo_uri)
-
-    client = model.client
-
-    db = client[database_name]
-    collection = db[collection_name]
 
     rows_to_insert = []
 
@@ -43,9 +37,8 @@ def import_data(collection_name, path):
             print(f"Progress: {i-1}/{total_records} records processed ({progress_percentage:.2f}%)", end="\r")
 
 
-    collection.insert_many(rows_to_insert)
+    model.collection.insert_many(rows_to_insert)
 
-    # Close the MongoDB connection
     model.close()
 
     print(f"\n{collection_name} successfully imported.\n")
