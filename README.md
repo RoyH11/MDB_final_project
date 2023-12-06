@@ -24,19 +24,13 @@ Before you begin, ensure you have the following installed:
    ```
    Install MongoDB Compass [here](https://www.mongodb.com/try/download/compass)
 
-3. **Redis:**
-   ```bash
-   pip3 install redis
-   ```
-   Install Redis server [here](https://redis.io/download/)
-
-4. **Neo4j:**
+3. **Neo4j:**
    ```bash
    pip3 install neo4j
    ```
    Install Neo4j server [here](https://neo4j.com/download/)
 
-5. **Book Review Data:**
+4. **Book Review Data:**
    
    The dataset being used is [here](https://www.kaggle.com/datasets/mohamedbakhet/amazon-books-reviews?select=books_data.csv)
 
