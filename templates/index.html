@@ -14,10 +14,11 @@
         <br>
         <br>
         <br>
-        <form action="/login" method="get">
+        <form id="loginForm" action="/login" method="get">
             <label for="login">Enter username:</label>
             <input type="text" id="login" name="username" style="width: 300px;">
             <button type="submit">Sign In</button>
+            <button type="button" id="randomLoginButton">Random</button>
         </form>
     </body>
 </html>
@@ -28,9 +29,11 @@
     const datalist = document.getElementById('titlesList');
     const randomButton = document.getElementById('randomButton');
     const searchButton = document.getElementById('searchButton');
+    const loginInputElement = document.getElementById('login')
 
     // this line works actually
     const bookTitles = {{ book_titles|safe }};
+    const usernames = {{ user_ids|safe }};
 
     inputElement.addEventListener('input', function () {
         const inputValue = inputElement.value.toLowerCase();
@@ -57,6 +60,12 @@
                 inputElement.value = randomTitle;
             });
 
+    document.getElementById('randomLoginButton').addEventListener('click', function () {
+                const randomIndex = Math.floor(Math.random() * usernames.length);
+                const randomUser = usernames[randomIndex];
+                document.getElementById('login').value = randomUser;
+            });
+
     document.getElementById('bookForm').addEventListener('submit', function (event) {
                 const enteredTitle = inputElement.value;
 
@@ -67,6 +76,16 @@
 
                     // Display an error message (you can customize this part)
                     alert('Invalid title. Please enter a valid book title.');
+                }
+            });
+
+    document.getElementById('loginForm').addEventListener('submit', function (event) {
+                const enteredUsername = loginInputElement.value;
+
+                if (!usernames.includes(enteredUsername)) {
+                    event.preventDefault();
+
+                    alert('Invalid username.');
                 }
             });
 </script>

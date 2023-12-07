@@ -92,9 +92,54 @@ class MongoModel:
 
 
 class Neo4jModel:
-    def __init__(self, url="bolt://localhost:7687", user="[placeholder]", password="[placeholder]"):
+    def __init__(self, url="bolt://localhost:7687", user="neo4j", password="password"):
         self.url = url
         self.driver = neo4j.GraphDatabase.driver(url, auth=(user, password))
 
     def close(self):
         self.driver.close()
+
+    def get_all_user_ids(self):
+        with self.driver.session() as session:
+            result = session.run("MATCH (u:User) RETURN DISTINCT u.User_id")
+            user_ids = [record["u.User_id"] for record in result]
+            return user_ids
+        
+    def get_custom_recommendation(self, username):
+        with self.driver.session() as session:
+            query = """
+                    MATCH (u:User {User_id: $userId})-[:RATED]->(bookU:Book) 
+                    WITH u, COLLECT(bookU) AS userBooks 
+
+                    MATCH (otherUser:User)-[:RATED]->(bookOther:Book) 
+                    WHERE otherUser <> u 
+                    WITH otherUser, COLLECT(bookOther) AS otherUserBooks, userBooks 
+
+                    WITH otherUser, 
+                        [book in otherUserBooks WHERE book IN userBooks | book] AS sharedBooks, 
+                        [book in otherUserBooks WHERE NOT book IN userBooks | book] AS nonSharedBooks 
+
+                    WHERE SIZE(nonSharedBooks) >= 1 
+
+                    WITH sharedBooks, nonSharedBooks 
+                    ORDER BY SIZE(sharedBooks) DESC 
+                    LIMIT 1 
+
+                    UNWIND nonSharedBooks AS book 
+
+                    WITH book, AVG(book.score) AS avgRating 
+                    ORDER BY avgRating DESC 
+                    LIMIT 1 
+
+                    RETURN book.Title as title 
+                    """
+            result = session.run(query, userId=username)
+
+            if not result:
+                return ""
+
+            record = result.single()
+
+            recommendation = record["title"]
+
+            return recommendation
