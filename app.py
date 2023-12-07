@@ -29,13 +29,23 @@ def recommendations():
 
 @app.route("/login")
 def custom_recommendations():
-    neo4j_model = Neo4jModel() 
+    neo4j_model = Neo4jModel()
+    mongo_model = MongoModel() 
     username = request.args.get("username")
 
-    recommendation = neo4j_model.get_custom_recommendation(username)
-    neo4j_model.close()
+    title, sharedBooks, similarUser = neo4j_model.get_custom_recommendation(username)
+    book = mongo_model.get_book_by_title(title)
 
-    return render_template("customRecommendations.html", username=username, recommendation=recommendation)
+    seen_titles = set()
+    info = []
+    for title in sharedBooks:
+        if title not in seen_titles: 
+            seen_titles.add(title)
+            info.append(mongo_model.get_book_by_title(title))
+
+    neo4j_model.close()
+    mongo_model.close()
+    return render_template("customRecommendations.html", username=username, book=book, similarUser=similarUser, sharedBooks=info)
 
 if __name__ == "__main__":
     app.run(host='127.0.0.1', port=8888, debug=True)

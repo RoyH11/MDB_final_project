@@ -1,6 +1,6 @@
 import pymongo
 import neo4j
-import json
+import re
 
 class MongoModel:
     def __init__(self, url="mongodb://localhost:27017"):
@@ -34,7 +34,12 @@ class MongoModel:
             print("Created text index on description, Title, and categories")
 
     def get_book_by_title(self, title):
+        regex_title = re.compile(title, re.IGNORECASE)
+
         target_book = self.collection.find_one({"Title": title})
+        if not target_book:
+            target_book = self.collection.find_one({"Title": {"$regex": regex_title}})
+            
         return {
             "Title": target_book["Title"],
             "description": target_book["description"],
@@ -121,17 +126,17 @@ class Neo4jModel:
 
                     WHERE SIZE(nonSharedBooks) >= 1 
 
-                    WITH sharedBooks, nonSharedBooks 
+                    WITH sharedBooks, nonSharedBooks, otherUser 
                     ORDER BY SIZE(sharedBooks) DESC 
                     LIMIT 1 
 
                     UNWIND nonSharedBooks AS book 
 
-                    WITH book, AVG(book.score) AS avgRating 
+                    WITH book, AVG(book.score) AS avgRating, sharedBooks, otherUser  
                     ORDER BY avgRating DESC 
                     LIMIT 1 
 
-                    RETURN book.Title as title 
+                    RETURN book.Title as title, [title IN sharedBooks | title.Title] as sharedBooksTitles, otherUser.User_id 
                     """
             result = session.run(query, userId=username)
 
@@ -140,6 +145,8 @@ class Neo4jModel:
 
             record = result.single()
 
-            recommendation = record["title"]
+            title = record["title"]
+            sharedBooks = record["sharedBooksTitles"]
+            similarUser = record["otherUser.User_id"]
 
-            return recommendation
+            return title, sharedBooks, similarUser
