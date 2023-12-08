@@ -34,11 +34,7 @@ class MongoModel:
             print("Created text index on description, Title, and categories")
 
     def get_book_by_title(self, title):
-        regex_title = re.compile(title, re.IGNORECASE)
-
         target_book = self.collection.find_one({"Title": title})
-        if not target_book:
-            target_book = self.collection.find_one({"Title": {"$regex": regex_title}})
             
         return {
             "Title": target_book["Title"],
@@ -74,6 +70,7 @@ class MongoModel:
         ]
 
         # for if description fails
+        # this part is dumb but it works some how
         if len(recommended_books) != 5:
             search_result = self.collection.find(
             {
@@ -112,41 +109,4 @@ class Neo4jModel:
         
     def get_custom_recommendation(self, username):
         with self.driver.session() as session:
-            query = """
-                    MATCH (u:User {User_id: $userId})-[:RATED]->(bookU:Book) 
-                    WITH u, COLLECT(bookU) AS userBooks 
-
-                    MATCH (otherUser:User)-[:RATED]->(bookOther:Book) 
-                    WHERE otherUser <> u 
-                    WITH otherUser, COLLECT(bookOther) AS otherUserBooks, userBooks 
-
-                    WITH otherUser, 
-                        [book in otherUserBooks WHERE book IN userBooks | book] AS sharedBooks, 
-                        [book in otherUserBooks WHERE NOT book IN userBooks | book] AS nonSharedBooks 
-
-                    WHERE SIZE(nonSharedBooks) >= 1 
-
-                    WITH sharedBooks, nonSharedBooks, otherUser 
-                    ORDER BY SIZE(sharedBooks) DESC 
-                    LIMIT 1 
-
-                    UNWIND nonSharedBooks AS book 
-
-                    WITH book, AVG(book.score) AS avgRating, sharedBooks, otherUser  
-                    ORDER BY avgRating DESC 
-                    LIMIT 1 
-
-                    RETURN book.Title as title, [title IN sharedBooks | title.Title] as sharedBooksTitles, otherUser.User_id 
-                    """
-            result = session.run(query, userId=username)
-
-            if not result:
-                return ""
-
-            record = result.single()
-
-            title = record["title"]
-            sharedBooks = record["sharedBooksTitles"]
-            similarUser = record["otherUser.User_id"]
-
-            return title, sharedBooks, similarUser
+            pass
