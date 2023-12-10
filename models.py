@@ -1,6 +1,5 @@
 import pymongo
 import neo4j
-import re
 
 class MongoModel:
     def __init__(self, url="mongodb://localhost:27017"):
@@ -70,7 +69,6 @@ class MongoModel:
         ]
 
         # for if description fails
-        # this part is dumb but it works some how
         if len(recommended_books) != 5:
             search_result = self.collection.find(
             {
@@ -107,6 +105,30 @@ class Neo4jModel:
             user_ids = [record["u.User_id"] for record in result]
             return user_ids
         
+    def get_all_rated_books(self, username):
+        with self.driver.session() as session:
+            result = session.run('MATCH (u:User {User_id: $userId})-[r:RATED]->(b:Book) return b.Title', {"userId": username})
+            return [record["b.Title"] for record in result]
+        
     def get_custom_recommendation(self, username):
         with self.driver.session() as session:
-            pass
+            query = """
+                    MATCH (u:User {User_id: $userId})-[:SIMILAR]->(m:User)-[r:RATED]->(b:Book)
+                    WHERE NOT EXISTS((u)-[:RATED]->(b))
+                    WITH u, m, b, r.score AS score
+                    ORDER BY score DESC
+                    WITH u, m, COLLECT(b)[..1] AS recommendedBooks
+                    RETURN recommendedBooks[0].Title AS recommendedTitle, m.User_id as user
+                    LIMIT 3;
+                    """
+            
+            result = session.run(query, {"userId": username})
+
+            titles = []
+            users = []
+
+            for record in result:
+                titles.append(record["recommendedTitle"])
+                users.append(record["user"])
+
+            return titles, users

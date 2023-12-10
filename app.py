@@ -32,7 +32,11 @@ def custom_recommendations():
     neo4j_model = Neo4jModel()
     username = request.args.get("username")
 
-    return render_template("customRecommendations.html")
+    titles, users = neo4j_model.get_custom_recommendation(username)
+    rated_books = neo4j_model.get_all_rated_books(username)
+    neo4j_model.close()
+
+    return render_template("customRecommendations.html", titles=titles, username=username, users=users, ratedBooks=rated_books)
 
 if __name__ == "__main__":
     app.run(host='127.0.0.1', port=8888, debug=True)

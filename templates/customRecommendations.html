@@ -1,21 +1,29 @@
 <html>
-    <div>
-        <div><strong>Custom recommendation for {{ username }}:</strong></div>
-        <div><strong>Title: </strong>{{ book["Title"] }}</div>
-        <div><strong>Categories: </strong>{{ book["categories"] }}</div>
-        <div><details><summary><strong>Description: </strong></summary>{{ book["description"] }}</details></div>
-    </div>
-    <br>
-    <div><strong>Most similar user: </strong>{{ similarUser }}</div>
-    <hr>
-    <div><strong>Shared Books:</strong></div>
+    <div><strong>Books rated by {{ username }}:</strong></div>
     <ul>
-        {% for book in sharedBooks %}
+        {% for title in ratedBooks %}
             <li>
-                <strong>Title: </strong>{{ book['Title'] }}<br>
-                <strong>Categories: </strong>{{ book['categories'] }}<br>
-                <details><summary><strong>Description: </strong></summary>{{ book['description'] }}</details><br>
+                <strong>Title: </strong>{{ title }}<br>
             </li>
         {% endfor %}
     </ul>
+    <br>
+    <div><strong>Most similar users:</strong></div>
+    <ul>
+        {% for user in users %}
+            <li>
+                <strong>User: </strong>{{ user }}<br>
+            </li>
+        {% endfor %}
+    </ul>
+    <hr>
+    <div><strong>Custom recommendations for {{ username }}:</strong></div>
+    <ul>
+        {% for title in titles %}
+            <li>
+                <strong>Title: </strong>{{ title }}<br>
+            </li>
+        {% endfor %}
+    </ul>
+    <a href="{{ url_for('index') }}"><button>Home</button></a>
 </html>

@@ -1,9 +1,5 @@
 from models import Neo4jModel
 
-# run generateFormattedRatings.py
-# put the file it generated in your neo import folder then run this
-
-
 create_index_user = """
 CREATE INDEX FOR (u:User) ON (u.User_id)
 """
@@ -26,8 +22,8 @@ def import_data(path):
 
     with model.driver.session() as session:
         # uncomment if you need indexes
-        # session.run(create_index_user)
-        # session.run(create_index_book)
+        session.run(create_index_user)
+        session.run(create_index_book)
 
         session.run(cypher_load_csv, {"csvFile": "file:///" + path})
         
