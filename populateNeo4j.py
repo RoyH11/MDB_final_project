@@ -21,7 +21,7 @@ def import_data(path):
     model = Neo4jModel()
 
     with model.driver.session() as session:
-        # uncomment if you need indexes
+        # comment if you dont need indexes
         session.run(create_index_user)
         session.run(create_index_book)
 
